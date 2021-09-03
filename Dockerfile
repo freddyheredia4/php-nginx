@@ -1,20 +1,9 @@
-FROM php:7.1-fpm-buster
+FROM php:7.4-fpm-buster
 
 
-ENV COMPOSER_VERSION=1.10.22
+ENV COMPOSER_VERSION=2.1.6
 
-# this is a sample BASE image, that php_fpm projects can start FROM
-# it's got a lot in it, but it's designed to meet dev and prod needs in single image
-# I've tried other things like splitting out php_fpm and nginx containers
-# or multi-stage builds to keep it lean, but this is my current design for
-## single image that does nginx and php_fpm
-## usable with bind-mount and unique dev-only entrypoint file that builds
-## some things on startup when developing locally
-## stores all code in image with proper default builds for production
 
-# install apt dependencies
-# some of these are not needed in all php projects
-# NOTE: you should prob use specific versions of some of these so you don't break your app
 RUN apt-get update && apt-get install --no-install-recommends --no-install-suggests -y \
     apt-transport-https \
     ca-certificates \
@@ -29,8 +18,10 @@ RUN apt-get update && apt-get install --no-install-recommends --no-install-sugge
     libfreetype6-dev \
     libicu-dev \
     libjpeg62-turbo-dev \
+    libpng-dev \
     libmcrypt-dev \
     libpq-dev \
+    libreadline-dev \
     supervisor \
     && rm -r /var/lib/apt/lists/*
 
@@ -41,14 +32,13 @@ RUN docker-php-ext-install \
     pdo_pgsql \
     pgsql \
     json \
-    readline \
     gd \
     intl
 
 # configure gd
 RUN docker-php-ext-configure gd \
-    --with-freetype-dir=/usr/include/freetype2 \
-    --with-jpeg-dir=/usr/include/
+    --with-freetype \
+    --with-jpeg
 
 # configure intl
 RUN docker-php-ext-configure intl
