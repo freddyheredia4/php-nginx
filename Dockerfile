@@ -34,6 +34,10 @@ RUN apt-get update && apt-get install --no-install-recommends --no-install-sugge
     supervisor \
     && rm -r /var/lib/apt/lists/*
 
+# configure gd
+RUN docker-php-ext-configure gd \
+    --with-freetype-dir=/usr/include/freetype2 \
+    --with-jpeg-dir=/usr/include/
 
 # Install extensions using the helper script provided by the base image
 RUN docker-php-ext-install \
@@ -45,10 +49,7 @@ RUN docker-php-ext-install \
     gd \
     intl
 
-# configure gd
-RUN docker-php-ext-configure gd \
-    --with-freetype-dir=/usr/include/freetype2 \
-    --with-jpeg-dir=/usr/include/
+
 
 # configure intl
 RUN docker-php-ext-configure intl
